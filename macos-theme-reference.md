@@ -379,6 +379,129 @@ Opacity:       0.29999999999999999
 
 ---
 
+---
+
+## 📂 Phần 2: Tổ Chức Thư Mục — Chuẩn Hóa Không Gian Làm Việc
+
+> 🤖 **Agent:** Sau khi hoàn tất phần giao diện macOS ở trên, tiếp tục tổ chức lại cây thư mục Home cho gọn gàng, khoa học. Mục tiêu: **project-based**, không dùng các thư mục mặc định của Ubuntu (Documents, Music, Videos...).
+
+### Cấu trúc đích
+
+```
+/home/<user>/
+├── Projects/                 ← TẤT CẢ code & dự án để ở đây
+│   └── <tên-dự-án>/          ← Mỗi dự án một thư mục riêng
+│       ├── README.md         ← Luôn có file mô tả dự án
+│       └── ...
+│
+├── Scripts/                  ← Script tiện ích cá nhân
+│   └── *.sh                  ← Script bash (chmod +x)
+│
+├── Tools/                    ← Tool portable, AppImage, binary
+│   └── ...
+│
+├── Downloads/                ← Giữ nguyên, dọn dẹp định kỳ
+├── Pictures/
+│   └── Screenshots/          ← Ảnh chụp màn hình
+├── Desktop/                  ← Để trống (sạch sẽ)
+│
+├── Documents/                ← KHÔNG dùng (code để trong Projects)
+├── Music/                    ← KHÔNG dùng
+├── Videos/                   ← KHÔNG dùng
+├── Templates/                ← KHÔNG dùng
+└── Public/                   ← KHÔNG dùng
+```
+
+### Bước 1: Tạo cấu trúc thư mục
+
+```bash
+# Tạo thư mục chính
+mkdir -p ~/Projects ~/Scripts ~/Tools ~/Pictures/Screenshots
+
+# Đảm bảo Desktop trống
+rm -f ~/Desktop/* 2>/dev/null
+
+echo "✅ Cấu trúc thư mục đã tạo"
+```
+
+### Bước 2: Thiết lập GNOME Shortcuts (thư mục yêu thích)
+
+```bash
+# Đặt Projects, Scripts, Tools vào sidebar Files (Nautilus)
+# Sửa bookmarks: giữ lại Projects, Downloads, Pictures; bỏ Documents, Music, Videos...
+
+# Tạo symlink cho nhanh (tùy chọn)
+# Không cần — Nautilus tự hiển thị các thư mục gốc của Home
+```
+
+### Bước 3: Dọn dẹp các thư mục mặc định
+
+> ⚠️ **Không xóa** các thư mục mặc định (có thể gây lỗi với một số ứng dụng). Chỉ cần **không sử dụng** chúng.
+
+```bash
+# Xác nhận tất cả thư mục mặc định đều trống
+echo "=== Kiểm tra thư mục trống ==="
+for dir in Documents Music Videos Templates Public Desktop; do
+    count=$(ls -A ~/$dir 2>/dev/null | wc -l)
+    if [ "$count" -eq 0 ]; then
+        echo "  ~/$dir → TRỐNG ✓"
+    else
+        echo "  ~/$dir → có $count file/thư mục"
+    fi
+done
+```
+
+### Bước 4: Ghi chú cho người dùng
+
+Sau khi tổ chức xong, nguyên tắc làm việc:
+
+| Quy tắc | Mô tả |
+|---|---|
+| **Code → Projects** | Mọi dự án (code, tài liệu thiết kế, research) để trong `~/Projects/<tên>/` |
+| **Script → Scripts** | Script bash, python tiện ích cá nhân để trong `~/Scripts/` |
+| **Tool → Tools** | AppImage, binary portable, công cụ không cài qua apt/snap để trong `~/Tools/` |
+| **Desktop sạch** | Không để file nào trên Desktop |
+| **Downloads tạm** | Dọn `~/Downloads/` định kỳ — không lưu trữ lâu dài ở đây |
+
+### Bước 5: Kiểm tra kết quả
+
+```bash
+echo "╔════════════════════════════════════════╗"
+echo "║     DIRECTORY STRUCTURE CHECK         ║"
+echo "╚════════════════════════════════════════╝"
+echo ""
+echo "Home: $(du -sh ~/ 2>/dev/null | cut -f1)"
+echo ""
+echo "=== Thư mục chính ==="
+for dir in Projects Scripts Tools Downloads Pictures Desktop; do
+    size=$(du -sh ~/$dir 2>/dev/null | cut -f1)
+    items=$(ls -A ~/$dir 2>/dev/null | wc -l)
+    echo "  ~/$dir/  ($size, $items items)"
+done
+echo ""
+echo "=== Thư mục mặc định (nên trống) ==="
+for dir in Documents Music Videos Templates Public; do
+    items=$(ls -A ~/$dir 2>/dev/null | wc -l)
+    [ "$items" -eq 0 ] && echo "  ~/$dir/  TRỐNG ✓" || echo "  ~/$dir/  $items items ⚠️"
+done
+```
+
+**Kết quả mong đợi:**
+
+```
+~/Projects/   (có 1+ dự án)
+~/Scripts/    (có script .sh)
+~/Tools/      (có thể trống)
+~/Downloads/  (tạm, ít file)
+~/Pictures/   (chủ yếu Screenshots/)
+~/Desktop/    TRỐNG
+~/Documents/  TRỐNG
+~/Music/      TRỐNG
+~/Videos/     TRỐNG
+```
+
+---
+
 > ✅ **Đã xác nhận hoạt động trên:** HP 340S G7, Ubuntu 24.04 LTS, GNOME 46, Wayland.
 >
 > 📅 **Ngày xác nhận cuối:** 2026-08-07
